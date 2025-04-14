@@ -58,7 +58,7 @@ residual_60 = actual_60-predicted_60
 residual_40
 residual_60
 ```
-To adjust for the systematic effect of age, we use fair comparison to find the creatinine clearance rate residuals for the 40-year-old and the 60-year-old. The 40-year-old creatinine clearance rate residual is 11.98 compared to the 60-year-old creatinine clearance rate residual of 1.38. The 60-year-old with a rate of 112 mL/minuteis healthies for their age due to having a higher residual for creatinine clearance rate.
+To adjust for the systematic effect of age, we use fair comparison to find the creatinine clearance rate residuals for the 40-year-old and the 60-year-old. The 40-year-old creatinine clearance rate residual is 11.98 compared to the 60-year-old creatinine clearance rate residual of 1.38. The 40-year-old with a rate of 135 mL/minute has a higher (more positive) residual, indicating that they have a healthier creatinine clearance rate for their age.
 
 ## Problem 2: Modeling disease growth
 ```{r}
@@ -69,17 +69,17 @@ covid <- read_csv("covid.csv")
 italy <- covid |>
   filter(country == "Italy")
 #model_italy <- lm(log(deaths) ~ #log(days_since_first_death), data = italy)
-boot_italy = do(10000)*lm(log(deaths) ~ (days_since_first_death), data = resample(italy))
+boot_italy = do(3)*lm(log(deaths) ~ (days_since_first_death), data = resample(italy))
 confint(boot_italy, level = .95)
 growth_rate <- 0.183218
 doubling_time <- 70/(growth_rate*100)
 round(growth_rate,3)
 round(doubling_time, 1)
 ```
-The estimated growth rate of the daily death total for Italy is 0.183, with a doubling time of 3.8 days. We are 95% confident that the growth rate of the daily death total for Italy is somewhere between 0.159 and 0.208, thus the doubling rate somewhere between 4.402 and 3.365 days.
+The estimated growth rate of the daily death total for Italy is 0.183, with a doubling time of 3.8 days. We are 95% confident that the true growth rate of the daily death total for Italy is somewhere between 0.159 and 0.208, thus the true doubling rate somewhere between 4.402 and 3.365 days.
 ```{r}
-lm_italy = lm(log(deaths) ~ days_since_first_death, data=italy)
-coef(lm_italy)
+model_italy = lm(log(deaths) ~ (days_since_first_death), data = italy)
+coef(model_italy)
 ```
 
 ### 2.
@@ -94,7 +94,7 @@ doubling_time <- 70/(growth_rate*100)
 round(growth_rate,3)
 round(doubling_time, 1)
 ```
-The estimated growth rate of the daily death total for Spain is 0.276, with a doubling time of 2.5 days. We are 95% confident that the growth rate of the daily death total for Spain is somewhere between 0.235 and 0.318, thus the doubling rate somewhere between 2.979 and 2.201 days.
+The estimated growth rate of the daily death total for Spain is 0.276, with a doubling time of 2.5 days. We are 95% confident that the true growth rate of the daily death total for Spain is somewhere between 0.235 and 0.318, thus the true doubling rate somewhere between 2.979 and 2.201 days.
 
 ```{r}
 lm_spain = lm(log(deaths) ~ days_since_first_death, data=spain)
@@ -118,7 +118,7 @@ milk <- read_csv("milk.csv")
 boot_milk <- do(10000) * lm(log(sales) ~ log(price), data = resample(milk))
 confint(boot_milk, level = .95)
 ```
-The estimated price elasticity of demand for milk is rounded to -1.62 We are 95% confident that the price elasticity of demand for milk is somewhere between -1.769 and -1.460. After logging both sales and price in order to obtain a linear relationship, we bootstrapped 10000 samples of a linear regression between milk sales and milk prices. To interpret the price elasticity of demand value, we say that a 1% increase in milk prices results in consumers wanting to buy about 1.62% less of it, on average.
+The estimated price elasticity of demand for milk is rounded to -1.62. We are 95% confident that the true price elasticity of demand for milk is somewhere between -1.769 and -1.460. After logging both sales and price in order to obtain a linear relationship, we bootstrapped 10000 samples of a linear regression between log(milk sales) and log(milk prices). To interpret the price elasticity of demand value, we say that a 1% increase in milk prices results in consumers wanting to buy about 1.62% less of it, on average.
 ```{r}
 lm_milk = lm(log(sales) ~ log(price), data=milk)
 coef(lm_milk)
